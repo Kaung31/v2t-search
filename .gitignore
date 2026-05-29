@@ -1,0 +1,11 @@
+# .gitignore
+__pycache__/
+*.pyc
+.venv/
+.env
+node_modules/
+.next/
+data/
+*.mp4
+*.pt        # model weights — too big for git
+.DS_Store   # macOS clutter
