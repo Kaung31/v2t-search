@@ -19,6 +19,11 @@ class Settings(BaseSettings):
 
     anthropic_api_key: str = ""
 
+    aide_fps: float = 15.0
+    aide_frames_per_clip: int = 45
+    aide_clip_duration_s: float = 3.0
+
+
     class Config:
         env_file = ".env"
 
