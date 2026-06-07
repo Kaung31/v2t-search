@@ -1,0 +1,80 @@
+{
+  "semantic_only": {
+    "appearance": {
+      "recall@10": 0.8167,
+      "precision@10": 0.8167,
+      "mrr": 0.9444,
+      "n": 12
+    },
+    "single_state": {
+      "recall@10": 0.125,
+      "precision@10": 0.125,
+      "mrr": 0.2727,
+      "n": 16
+    },
+    "compound": {
+      "recall@10": 0.04,
+      "precision@10": 0.04,
+      "mrr": 0.1012,
+      "n": 20
+    },
+    "overall": {
+      "recall@10": 0.2625,
+      "precision@10": 0.2625,
+      "mrr": 0.3692,
+      "n": 48
+    }
+  },
+  "correspondence_only": {
+    "appearance": {
+      "recall@10": 0.0,
+      "precision@10": 0.0,
+      "mrr": 0.0,
+      "n": 12
+    },
+    "single_state": {
+      "recall@10": 1.0,
+      "precision@10": 1.0,
+      "mrr": 1.0,
+      "n": 16
+    },
+    "compound": {
+      "recall@10": 0.98,
+      "precision@10": 1.0,
+      "mrr": 1.0,
+      "n": 20
+    },
+    "overall": {
+      "recall@10": 0.7417,
+      "precision@10": 0.75,
+      "mrr": 0.75,
+      "n": 48
+    }
+  },
+  "fused": {
+    "appearance": {
+      "recall@10": 0.8167,
+      "precision@10": 0.8167,
+      "mrr": 0.9444,
+      "n": 12
+    },
+    "single_state": {
+      "recall@10": 1.0,
+      "precision@10": 1.0,
+      "mrr": 1.0,
+      "n": 16
+    },
+    "compound": {
+      "recall@10": 0.985,
+      "precision@10": 0.975,
+      "mrr": 1.0,
+      "n": 20
+    },
+    "overall": {
+      "recall@10": 0.9479,
+      "precision@10": 0.9437,
+      "mrr": 0.9861,
+      "n": 48
+    }
+  }
+}
