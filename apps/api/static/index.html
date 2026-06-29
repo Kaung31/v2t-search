@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>V2T-Search</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0d12;
+    --panel: #11161f;
+    --panel-2: #161d29;
+    --border: #232d3d;
+    --border-bright: #31405a;
+    --text: #e6eaf2;
+    --muted: #788396;
+    --accent: #ff9e3d;        /* amber — driver / correspondence */
+    --accent-2: #45d3e6;      /* cyan — semantic */
+    --good: #58d68d;
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'IBM Plex Sans', sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    background-image:
+      radial-gradient(circle at 12% 18%, rgba(255,158,61,0.05), transparent 35%),
+      radial-gradient(circle at 88% 82%, rgba(69,211,230,0.05), transparent 35%);
+  }
+  header {
+    padding: 22px 30px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: baseline; gap: 16px;
+  }
+  .logo { font-family: var(--mono); font-weight: 600; font-size: 20px; letter-spacing: 1px; }
+  .logo .v { color: var(--accent); }
+  .tag { font-family: var(--mono); font-size: 11px; color: var(--muted); letter-spacing: 1px; }
+
+  .searchbar { padding: 24px 30px; display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+  .searchbar input[type=text] {
+    flex: 1; min-width: 280px;
+    background: var(--panel); border: 1px solid var(--border-bright);
+    color: var(--text); font-family: var(--sans); font-size: 15px;
+    padding: 13px 16px; border-radius: 8px; outline: none;
+    transition: border-color .15s;
+  }
+  .searchbar input[type=text]:focus { border-color: var(--accent); }
+  .btn {
+    background: var(--accent); color: #1a1206; border: none;
+    font-family: var(--mono); font-weight: 600; font-size: 13px; letter-spacing: 1px;
+    padding: 13px 24px; border-radius: 8px; cursor: pointer; transition: filter .15s;
+  }
+  .btn:hover { filter: brightness(1.1); }
+  .toggle { font-family: var(--mono); font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 7px; cursor: pointer; }
+
+  .plan {
+    margin: 0 30px 18px; padding: 12px 16px; background: var(--panel);
+    border: 1px solid var(--border); border-radius: 8px;
+    font-family: var(--mono); font-size: 12.5px; color: var(--muted);
+    display: none;
+  }
+  .plan .k { color: var(--accent); }
+  .plan .v { color: var(--text); }
+
+  .layout { display: grid; grid-template-columns: 340px 1fr; gap: 20px; padding: 0 30px 40px; }
+  @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
+
+  .results { display: flex; flex-direction: column; gap: 8px; }
+  .results h2 { font-family: var(--mono); font-size: 12px; color: var(--muted); letter-spacing: 1px; margin-bottom: 6px; }
+  .result {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 8px;
+    padding: 12px 14px; cursor: pointer; transition: border-color .15s, background .15s;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .result:hover { border-color: var(--border-bright); background: var(--panel-2); }
+  .result.active { border-color: var(--accent); }
+  .result .sid { font-family: var(--mono); font-weight: 600; font-size: 15px; }
+  .result .score { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+  .badges { display: flex; gap: 5px; margin-top: 5px; }
+  .badge { font-family: var(--mono); font-size: 9.5px; letter-spacing: .5px; padding: 2px 7px; border-radius: 4px; text-transform: uppercase; }
+  .badge.corr { background: rgba(255,158,61,0.14); color: var(--accent); border: 1px solid rgba(255,158,61,0.3); }
+  .badge.sem  { background: rgba(69,211,230,0.14); color: var(--accent-2); border: 1px solid rgba(69,211,230,0.3); }
+
+  .stage { display: flex; flex-direction: column; gap: 16px; }
+  .quad { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; background: var(--border); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+  .cam { position: relative; background: #000; aspect-ratio: 16/9; }
+  .cam video { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .cam .label {
+    position: absolute; top: 8px; left: 8px;
+    font-family: var(--mono); font-size: 10px; letter-spacing: 1.5px;
+    padding: 3px 8px; background: rgba(0,0,0,0.6); border-radius: 4px;
+    color: var(--text); border: 1px solid var(--border-bright);
+  }
+  .cam.incar .label { color: var(--accent); border-color: rgba(255,158,61,0.5); }
+  .cam.front .label { color: var(--accent-2); border-color: rgba(69,211,230,0.5); }
+
+  .transport { display: flex; align-items: center; gap: 14px; padding: 4px 2px; }
+  .transport button {
+    background: var(--panel-2); border: 1px solid var(--border-bright); color: var(--text);
+    font-family: var(--mono); font-size: 13px; width: 42px; height: 38px; border-radius: 8px; cursor: pointer;
+  }
+  .transport button:hover { border-color: var(--accent); }
+  .transport input[type=range] { flex: 1; accent-color: var(--accent); cursor: pointer; }
+  .transport .time { font-family: var(--mono); font-size: 12px; color: var(--muted); min-width: 96px; text-align: right; }
+
+  .why { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; }
+  .why h3 { font-family: var(--mono); font-size: 12px; color: var(--muted); letter-spacing: 1.5px; margin-bottom: 14px; }
+  .why-row { display: flex; align-items: center; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--border); }
+  .why-row:last-child { border-bottom: none; }
+  .why-cam { font-family: var(--mono); font-size: 10px; letter-spacing: 1px; padding: 3px 9px; border-radius: 4px; min-width: 78px; text-align: center; }
+  .why-cam.incar { background: rgba(255,158,61,0.14); color: var(--accent); }
+  .why-cam.front { background: rgba(69,211,230,0.14); color: var(--accent-2); }
+  .why-cam.sem   { background: rgba(88,214,141,0.14); color: var(--good); }
+  .why-val { font-family: var(--sans); font-size: 15px; font-weight: 500; }
+  .why-sub { font-family: var(--mono); font-size: 11px; color: var(--muted); margin-left: auto; }
+
+  .empty { color: var(--muted); font-family: var(--mono); font-size: 13px; padding: 40px; text-align: center; border: 1px dashed var(--border); border-radius: 10px; }
+</style>
+</head>
+<body>
+  <header>
+    <span class="logo"><span class="v">V2T</span>-SEARCH</span>
+    <span class="tag">CROSS-CAMERA DRIVING RETRIEVAL · AIDE</span>
+  </header>
+
+  <div class="searchbar">
+    <input type="text" id="q" placeholder="e.g. driver on the phone while turning"
+           value="driver on the phone while turning"
+           onkeydown="if(event.key==='Enter')doSearch()">
+    <label class="toggle"><input type="checkbox" id="useLlm"> use LLM planner</label>
+    <button class="btn" onclick="doSearch()">SEARCH</button>
+  </div>
+
+  <div class="plan" id="plan"></div>
+
+  <div class="layout">
+    <div class="results" id="results">
+      <h2>RESULTS</h2>
+      <div class="empty">Run a search to see results.</div>
+    </div>
+    <div class="stage" id="stage">
+      <div class="empty">Select a result to play all four cameras.</div>
+    </div>
+  </div>
+
+<script>
+const VIEWS = ["front", "left", "right", "incar"];
+let videos = [];
+let master = null;
+
+async function doSearch() {
+  const query = document.getElementById('q').value.trim();
+  const use_llm = document.getElementById('useLlm').checked;
+  if (!query) return;
+
+  const res = await fetch('/search', {
+    method: 'POST', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ query, use_llm, limit: 30 })
+  });
+  const data = await res.json();
+  renderPlan(data.plan);
+  renderResults(data.results);
+}
+
+function renderPlan(plan) {
+  const el = document.getElementById('plan');
+  const d = plan.driver_states.length ? plan.driver_states.join(', ') : '—';
+  const r = plan.road_states.length ? plan.road_states.join(', ') : '—';
+  const o = plan.object_classes.length ? plan.object_classes.join(', ') : '—';
+  el.innerHTML = `PLAN ▸ <span class="k">driver:</span> <span class="v">${d}</span>   ` +
+                 `<span class="k">road:</span> <span class="v">${r}</span>   ` +
+                 `<span class="k">objects:</span> <span class="v">${o}</span>   ` +
+                 `<span class="k">via:</span> <span class="v">${plan.planner}</span>`;
+  el.style.display = 'block';
+}
+
+function renderResults(results) {
+  const box = document.getElementById('results');
+  box.innerHTML = `<h2>RESULTS (${results.length})</h2>`;
+  if (!results.length) { box.innerHTML += '<div class="empty">No matches.</div>'; return; }
+  results.forEach(r => {
+    const div = document.createElement('div');
+    div.className = 'result';
+    div.id = 'r-' + r.sample_id;
+    const badges = r.matched_by.map(m =>
+      m === 'correspondence' ? '<span class="badge corr">corr</span>'
+                             : '<span class="badge sem">sem</span>').join('');
+    div.innerHTML = `<div><div class="sid">${r.sample_id}</div><div class="badges">${badges}</div></div>` +
+                    `<div class="score">${r.fused_score.toFixed(4)}</div>`;
+    div.onclick = () => selectResult(r);
+    box.appendChild(div);
+  });
+}
+
+function selectResult(r) {
+  document.querySelectorAll('.result').forEach(e => e.classList.remove('active'));
+  document.getElementById('r-' + r.sample_id)?.classList.add('active');
+
+  const stage = document.getElementById('stage');
+  stage.innerHTML = `
+    <div class="quad">
+      ${VIEWS.map(v => `
+        <div class="cam ${v}">
+          <span class="label">${v.toUpperCase()}</span>
+          <video id="vid-${v}" muted loop playsinline preload="auto"
+                 src="/video/${r.sample_id}/${v}"></video>
+        </div>`).join('')}
+    </div>
+    <div class="transport">
+      <button id="playBtn" onclick="togglePlay()">▶</button>
+      <input type="range" id="scrub" min="0" max="3" step="0.02" value="0" oninput="seekAll(this.value)">
+      <span class="time" id="time">0:00.0 / 0:03.0</span>
+    </div>
+    <div class="why">
+      <h3>WHY MATCHED</h3>
+      ${renderWhy(r.details)}
+    </div>`;
+
+  videos = VIEWS.map(v => document.getElementById('vid-' + v));
+  master = videos[0];
+  master.ontimeupdate = onMasterTick;
+  videos.forEach(v => v.currentTime = 0);
+  playAll();
+}
+
+function renderWhy(details) {
+  let rows = '';
+  if (details.correspondence) {
+    const c = details.correspondence;
+    if (c.incar) rows += `<div class="why-row"><span class="why-cam incar">INCAR</span>
+      <span class="why-val">${c.incar.event_type.replace(/_/g,' ')}</span>
+      <span class="why-sub">driver state</span></div>`;
+    if (c.front) rows += `<div class="why-row"><span class="why-cam front">FRONT</span>
+      <span class="why-val">${c.front.event_type.replace(/_/g,' ')}</span>
+      <span class="why-sub">road state</span></div>`;
+  }
+  if (details.semantic) {
+    const s = details.semantic;
+    rows += `<div class="why-row"><span class="why-cam sem">SEMANTIC</span>
+      <span class="why-val">${s.best_class}</span>
+      <span class="why-sub">${s.view} · ${s.score}</span></div>`;
+  }
+  return rows || '<div class="empty">No detail.</div>';
+}
+
+function playAll() { videos.forEach(v => v.play().catch(()=>{})); document.getElementById('playBtn').textContent = '❚❚'; }
+function pauseAll() { videos.forEach(v => v.pause()); document.getElementById('playBtn').textContent = '▶'; }
+function togglePlay() { master.paused ? playAll() : pauseAll(); }
+function seekAll(t) { videos.forEach(v => v.currentTime = parseFloat(t)); }
+
+function onMasterTick() {
+  const t = master.currentTime;
+  document.getElementById('scrub').value = t;
+  document.getElementById('time').textContent =
+    `0:${t.toFixed(1).padStart(4,'0')} / 0:03.0`;
+  // correct drift on the other three
+  videos.forEach(v => {
+    if (v !== master && Math.abs(v.currentTime - t) > 0.15) v.currentTime = t;
+  });
+}
+
+// run the default query on load
+doSearch();
+</script>
+</body>
+</html>

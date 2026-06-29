@@ -1,0 +1,23 @@
+# Render Blueprint (alternative to Railway). Scale-to-zero on the free/starter tier.
+services:
+  - type: web
+    name: v2t-search
+    runtime: docker
+    dockerfilePath: ./deploy/Dockerfile
+    dockerContext: .
+    plan: starter
+    healthCheckPath: /health
+    autoDeploy: false
+    envVars:
+      - key: DATABASE_URL
+        sync: false # Neon Postgres URL
+      - key: QDRANT_URL
+        sync: false
+      - key: QDRANT_API_KEY
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false # only needed if use_llm planning is enabled
+      - key: SIGLIP_MODEL
+        value: google/siglip2-base-patch16-256
+      - key: MEDIA_BASE_URL
+        sync: false # signed object-storage base for AIDE-derived clip media

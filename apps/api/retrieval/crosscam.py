@@ -20,6 +20,8 @@ class CorrespondenceHit:
 
 
 def _conn():
+    if settings.database_url:  # Neon / managed Postgres (conninfo includes sslmode)
+        return psycopg.connect(settings.database_url, row_factory=dict_row)
     return psycopg.connect(
         host=settings.postgres_host, port=settings.postgres_port,
         user=settings.postgres_user, password=settings.postgres_password,

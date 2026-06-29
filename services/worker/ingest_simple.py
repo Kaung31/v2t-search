@@ -22,7 +22,7 @@ COLLECTION = "frames"
 device = "mps" if torch.backends.mps.is_available() else "cpu"
 print(f"Processing: {VIDEO_PATH} on device: {device}")
 
-content_hash = hashlib.md5(Path(VIDEO_PATH).read_bytes()).hexdigest()[:12]
+content_hash = hashlib.md5(Path(VIDEO_PATH).read_bytes(), usedforsecurity=False).hexdigest()[:12]
 
 # --- Qdrant setup ---
 qdrant = QdrantClient(host="localhost", port=6333)

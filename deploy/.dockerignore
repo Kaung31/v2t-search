@@ -1,0 +1,16 @@
+# Keep the build context tiny — never ship the dataset, weights, venv, or caches.
+data/
+*.pt
+*.onnx
+.venv/
+__pycache__/
+**/__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+logs/
+eval/*.png
+.env
+.git/
+node_modules/
+apps/web/

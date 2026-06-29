@@ -19,7 +19,7 @@ def _conn():
 
 
 def get_or_create_asset(conn, sample_id: str, split: str, ann_path: str) -> int:
-    h = hashlib.md5(Path(ann_path).read_bytes()).hexdigest()[:12]
+    h = hashlib.md5(Path(ann_path).read_bytes(), usedforsecurity=False).hexdigest()[:12]
     with conn.cursor() as cur:
         cur.execute("""
             INSERT INTO assets (content_hash, sample_id, split)

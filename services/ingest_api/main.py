@@ -29,7 +29,7 @@ def ingest(req: IngestRequest):
             if req.limit and i >= req.limit:
                 break
             content_hash = hashlib.md5(
-                Path(row["annotation_path"]).read_bytes()
+                Path(row["annotation_path"]).read_bytes(), usedforsecurity=False
             ).hexdigest()[:12]
             r.xadd(STREAM, {
                 "content_hash":    content_hash,

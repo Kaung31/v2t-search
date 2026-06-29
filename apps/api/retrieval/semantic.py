@@ -18,7 +18,13 @@ _qdrant = None
 def _client() -> QdrantClient:
     global _qdrant
     if _qdrant is None:
-        _qdrant = QdrantClient(host=settings.qdrant_host, port=settings.qdrant_port)
+        if settings.qdrant_url:  # Qdrant Cloud
+            _qdrant = QdrantClient(
+                url=settings.qdrant_url,
+                api_key=settings.qdrant_api_key or None,
+            )
+        else:  # local docker
+            _qdrant = QdrantClient(host=settings.qdrant_host, port=settings.qdrant_port)
     return _qdrant
 
 

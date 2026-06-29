@@ -1,0 +1,32 @@
+# Query-time ("serve") dependency subset for the scale-to-zero CPU host.
+# Ingestion-only heavies (ultralytics, mediapipe, opencv) are intentionally excluded —
+# the live query path loads only the SigLIP TEXT encoder + Postgres + Qdrant.
+# Pinned to match the project's requirements.txt where applicable.
+
+# API
+fastapi>=0.115,<1
+uvicorn[standard]>=0.30,<1
+
+# SigLIP 2 text encoder (CPU torch is installed via the Dockerfile's CPU index)
+torch==2.12.0
+torchvision==0.27.0
+transformers==5.9.0
+safetensors==0.7.0
+tokenizers==0.22.2
+huggingface-hub==1.17.0
+hf-xet==1.5.0
+
+# Stores
+qdrant-client==1.18.0
+psycopg==3.3.4
+psycopg-binary==3.3.4
+
+# Planner (Claude NL planning is optional; rule-based works without a key)
+anthropic>=0.40
+
+# Core
+numpy==2.4.6
+pillow==12.2.0
+pydantic==2.13.4
+pydantic-settings==2.14.1
+python-dotenv==1.2.2

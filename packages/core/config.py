@@ -1,4 +1,3 @@
-import os
 from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
@@ -13,6 +12,13 @@ class Settings(BaseSettings):
 
     qdrant_host: str = "localhost"
     qdrant_port: int = 6333
+
+    # Cloud overrides (set in prod). When present these take precedence over the
+    # host/port fields above so the same code runs locally and on Neon/Qdrant Cloud.
+    database_url: str = ""        # postgresql://USER:PASS@HOST/db?sslmode=require (Neon)
+    qdrant_url: str = ""          # https://xxxx.cloud.qdrant.io:6333
+    qdrant_api_key: str = ""
+    media_base_url: str = ""      # signed object-storage base for AIDE-derived clip media
 
     siglip_model: str = "google/siglip2-base-patch16-256"
     siglip_dim: int = 768

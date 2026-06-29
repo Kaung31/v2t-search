@@ -1,5 +1,9 @@
 """Long-running Redis Streams consumer; idempotent + checkpointed."""
-import os, socket, time, redis, psycopg
+import os
+import socket
+import time
+import redis
+import psycopg
 from packages.core.config import settings
 from services.worker.pipeline import process_sample
 
